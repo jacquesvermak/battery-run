@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a1e3d">
+<meta name="description" content="A 30-second energy runner from Stage Zero — collect solar, batteries and coins, dodge the hazards, see how far you get.">
+<title>Battery Run — Stage Zero</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app">
+
+<section id="home" class="screen active">
+  <b class="brand">STAGE <i>ZERO</i></b>
+  <div class="hero"><span>☀️</span><div>🏃</div></div>
+  <p class="eyebrow">STAGE ZERO PRESENTS</p>
+  <h1>BATTERY<br><strong>RUN</strong></h1>
+  <p>Run. Charge. Power up.<br>How far can you go?</p>
+  <button id="start">▶ START RUN</button>
+  <small>BEST <b id="best">0</b> m</small>
+</section>
+
+<section id="game" class="screen">
+  <header>
+    <div>TIME<b id="time">30</b></div>
+    <div>BATTERY<b id="bat">50%</b></div>
+    <div>SCORE<b id="score">0</b></div>
+  </header>
+  <div class="bar"><i id="fill"></i></div>
+  <div id="world">
+    <div class="sun">☀️</div>
+    <div class="city"></div>
+    <div class="road"><div id="runner">🏃</div></div>
+    <div id="items"></div>
+    <div id="msg"></div>
+    <em>SWIPE ◀ ▶ TO MOVE</em>
+  </div>
+  <footer>
+    <button id="left" aria-label="Move left">◀</button>
+    <b id="dist">0 m</b>
+    <button id="right" aria-label="Move right">▶</button>
+  </footer>
+</section>
+
+<section id="result" class="screen result">
+  <div>⚡</div>
+  <p class="eyebrow">RUN COMPLETE</p>
+  <h2>ENERGY<br><strong>HERO</strong></h2>
+  <article>
+    <span>DISTANCE<b id="fd">0 m</b></span>
+    <span>BATTERIES<b id="fb">0</b></span>
+    <span>ENERGY<b id="fe">0</b></span>
+    <span>SCORE<b id="fs">0</b></span>
+  </article>
+  <h3 id="nb"></h3>
+  <button id="again">↻ RUN AGAIN</button>
+  <button id="share">↗ CHALLENGE A FRIEND</button>
+  <button id="home">BACK TO HOME</button>
+</section>
+
+</main>
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+apiVersion: v2
+name: sz-battery-run-game
+description: A Helm chart for Battery Run — a 30-second lane runner built for Stage Zero activations
+version: 0.1.0
+appVersion: "0.0.0-unreleased"
+type: application
+keywords:
+  - static
+  - nginx
+  - marketing
+maintainers:
+  - name: Stage Zero
+    email: devops@stagezero.co.za

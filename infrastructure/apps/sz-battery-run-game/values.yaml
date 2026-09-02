@@ -1,0 +1,47 @@
+# Battery Run — QA Environment Configuration
+# ==========================================
+# This is the chart's DEFAULT values file, deliberately — not env/qa/values.yaml.
+# Helm reads ./values.yaml automatically, so ArgoCD picks it up with no
+# `helm.valueFiles` configuration on the Application. That matters for more than
+# convenience: .github/workflows/deploy.yml rewrites the image tag in this file,
+# so CI and ArgoCD are guaranteed to read the same file — see sz-loadbreaker-game
+# for the same pattern.
+
+image:
+  repository: harbor.qa.stagezero.co.za/library/sz-battery-run-game
+  tag: "0.0.0-unreleased"
+  pullPolicy: Always
+
+imagePullSecrets: []
+
+replicaCount: 1
+
+# A static file server. Every expensive thing in this app (the run loop,
+# spawning, collisions, scoring) runs in the visitor's browser, not in the pod.
+resources:
+  requests:
+    cpu: "10m"
+    memory: "16Mi"
+  limits:
+    cpu: "100m"
+    memory: "64Mi"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080   # nginx-unprivileged listens on 8080 as a non-root uid
+
+ingress:
+  enabled: true
+  className: nginx
+  host: battery-run.qa.stagezero.co.za
+  tlsSecret: qa-cert
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+healthCheck:
+  path: /healthz
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
