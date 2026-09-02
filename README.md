@@ -63,9 +63,9 @@ compound on top.
 ## Architecture
 
 ```
-index.html            structure + the exact ids game.js binds to
-style.css              tokens, screens, lane/road math, animations
-game.js                 game state, spawn/collision loop, screens, persistence
+index.html             structure + the exact ids game.js binds to
+style.css               tokens, screens, lane/road math, animations
+game.js                  game state, spawn/collision loop, screens, persistence
 ```
 
 No React, no bundler — a single `requestAnimationFrame` loop drives
@@ -78,15 +78,50 @@ a few font sizes).
 Best distance persists in `localStorage` per device — there's no shared
 leaderboard here (see "Known limits").
 
-## Deploying
+## Deploying to QA
 
-Not yet wired to Docker/Kubernetes — ask if you want the same
-Dockerfile + Helm chart + GitHub Actions + ArgoCD setup used for
-`sz-loadbreaker-game`, pointed at whatever hostname you want
-(`battery-run.qa.stagezero.co.za`, say).
+Push to `main` → GitHub Action builds the image → Harbor → the action rewrites
+the image tag in `infrastructure/apps/sz-battery-run-game/values.yaml` →
+ArgoCD syncs. Lands at **https://battery-run.qa.stagezero.co.za**.
+
+Same pattern as `sz-loadbreaker-game`: the chart keeps its config in the
+default `values.yaml` rather than an `env/qa/` overlay, so Helm — and
+therefore ArgoCD — reads it with no `helm.valueFiles` setting on the
+Application. CI rewrites the same file ArgoCD renders, which removes any way
+for the two to disagree about the image tag. `nginx.conf` sends
+`Cache-Control: no-store` on `index.html`, `style.css` and `game.js` — this
+whole app is a few KB, so there's no real cost to always revalidating, and it
+avoids a stale cached copy of the game logic surviving a fix (this bit
+Loadbreaker once).
+
+### One-time setup
+
+| What | Where |
+| --- | --- |
+| `HARBOR_URL` variable | GitHub repo → Settings → Variables |
+| `HARBOR_CA_CERT`, `HARBOR_USERNAME`, `HARBOR_PASSWORD` | GitHub repo → Settings → Secrets |
+| ArgoCD `Application` → `path: infrastructure/apps/sz-battery-run-game` (no values file needed) | ArgoCD, `argocd` namespace |
+| `qa-cert` TLS secret present in the `sz-battery-run-game` namespace | cluster |
+
+The ArgoCD `Application` itself isn't part of this repo's GitOps loop — it's
+the one resource registered by hand (`kubectl apply`) against the `argocd`
+namespace before anything here starts syncing.
+
+## Files
+
+- `index.html` / `style.css` / `game.js` — the whole game
+- `Dockerfile` · `nginx.conf` — static image, non-root nginx on 8080, `/healthz`
+- `infrastructure/apps/sz-battery-run-game/` — Helm chart deployed by ArgoCD
+- `.github/workflows/deploy.yml` — build → push to Harbor → rewrite manifest → ArgoCD sync
 
 ## Known limits of this build
 
+- **QA is running a manually-pushed image tag, not real CI.** The GitHub
+  Actions workflow is wired up correctly but needs the three Harbor secrets
+  (above) added to the repo before a push to `main` builds and deploys on
+  its own — until then, a code change needs a manual
+  `docker build && docker push` plus a `values.yaml` tag bump, same as every
+  update so far.
 - **No shared leaderboard.** Best distance is per-device (`localStorage`).
   A real cross-booth leaderboard needs a small backend.
 - **No lead-capture screen.** Unlike Loadbreaker, this build doesn't ask for
