@@ -9,7 +9,7 @@
 
 image:
   repository: harbor.qa.stagezero.co.za/library/sz-battery-run-game
-  tag: "0.0.0-unreleased"
+  tag: "initial"
   pullPolicy: Always
 
 imagePullSecrets: []
