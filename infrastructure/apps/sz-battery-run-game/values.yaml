@@ -9,7 +9,7 @@
 
 image:
   repository: harbor.qa.stagezero.co.za/library/sz-battery-run-game
-  tag: "no-cache"
+  tag: "bigger-slower"
   pullPolicy: Always
 
 imagePullSecrets: []

@@ -11,12 +11,12 @@
 
   var ROUND_SECONDS = 30;
   var LANE_X = [22, 50, 78]; // percent, left/center/right lane centers
-  var BASE_SPEED = 55;       // starting m/s-equivalent
-  var SPEED_GAIN = 1.85;     // per elapsed second
-  var MILESTONE_BUMP = 8;    // instant speed jump on crossing a milestone
+  var BASE_SPEED = 36;       // starting m/s-equivalent
+  var SPEED_GAIN = 1.1;      // per elapsed second
+  var MILESTONE_BUMP = 5;    // instant speed jump on crossing a milestone
   var MILESTONES = [500, 1000, 2000];
   var RUNNER_ROW = 82;       // percent-of-world where collisions resolve
-  var HIT_TOLERANCE = 7;
+  var HIT_TOLERANCE = 8;
 
   var ITEM_TYPES = {
     solar:   { emoji:"☀️", kind:"good", score:18, battery: 7  },
@@ -213,10 +213,10 @@
     spawnTimer -= dt;
     if(spawnTimer <= 0){
       spawnItem();
-      spawnTimer = Math.max(0.42, 0.95 - state.elapsed * 0.014);
+      spawnTimer = Math.max(0.55, 1.15 - state.elapsed * 0.010);
     }
 
-    var fallRate = speed * 1.15; // percent-of-world-height per second
+    var fallRate = speed * 0.8; // percent-of-world-height per second
     var runnerLane = state.lane;
     Array.prototype.slice.call(itemsEl.querySelectorAll(".item")).forEach(function(el){
       var y = parseFloat(el.dataset.y) + fallRate * dt;
