@@ -1,6 +1,6 @@
 # Battery Run — Stage Zero
 
-A 30-second lane runner for a sales-booth hand-off: tap ◀ ▶, swipe, or use the
+A 60-second lane runner for a sales-booth hand-off: tap ◀ ▶, swipe, or use the
 arrow keys to dodge hazards and collect energy on the way to the highest
 distance and score you can manage before the clock — or your battery — runs
 out.
@@ -18,16 +18,16 @@ Open <http://localhost:8080>.
 
 ## The loop
 
-1. **Start.** 30 seconds on the clock, battery at 50%.
+1. **Start.** 60 seconds on the clock, battery at 50%.
 2. **Move between 3 lanes** to collect what's falling toward you and dodge
-   the rest. Difficulty is one continuous curve, not fixed levels: your speed
-   ramps up every second you survive, *and* jumps again the instant you cross
-   500m, 1,000m or 2,000m — each crossing pops a "🔥 Speed up!" banner.
+   the rest. Speed steps up once every 10 seconds (a short "⚡ Speeding up!"
+   banner marks each step), *and* jumps again the instant you cross 500m,
+   1,000m or 2,000m — each of those pops its own "🔥 Speed up!" banner.
 3. **Battery drains continuously**, a little faster the longer you last.
    Hazards drain it harder; solar and batteries refill it. Coins are pure
    score — no battery effect, since they're deliberately a bit riskier to
    detour for.
-4. **The run ends** the moment either the 30-second clock or your battery
+4. **The run ends** the moment either the 60-second clock or your battery
    hits zero, whichever comes first.
 5. **Result screen** — distance, batteries collected, other energy collected,
    score, and a "beat my score" share.
@@ -55,9 +55,10 @@ few seconds aren't.
 ### Scoring
 
 Score is time-passive (+10/sec just for staying alive) plus whatever you
-collect. A full, clean 30-second run — no hits, no early battery-out — covers
-almost exactly 2,481m, which is also roughly where the "2,000m" milestone
-banner and the last speed jump land.
+collect. A full, clean 60-second run — no early battery-out — covers roughly
+2,800m from the speed steps alone (six 10-second tiers at 32, 38, 44, 50, 56
+and 62 m/s-equivalent), typically more once distance-milestone speed bumps
+compound on top.
 
 ## Architecture
 

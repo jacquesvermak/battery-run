@@ -9,11 +9,12 @@
   var fillEl = $("#fill"), barEl = document.querySelector(".bar");
   var distEl = $("#dist"), bestEl = $("#best");
 
-  var ROUND_SECONDS = 30;
+  var ROUND_SECONDS = 60;
   var LANE_X = [22, 50, 78]; // percent, left/center/right lane centers
-  var BASE_SPEED = 36;       // starting m/s-equivalent
-  var SPEED_GAIN = 1.1;      // per elapsed second
-  var MILESTONE_BUMP = 5;    // instant speed jump on crossing a milestone
+  var BASE_SPEED = 32;       // starting m/s-equivalent
+  var SPEED_TIER_SECONDS = 10; // speed steps up once per this many seconds
+  var SPEED_TIER_STEP = 6;     // amount added per tier
+  var MILESTONE_BUMP = 5;      // instant speed jump on crossing a distance milestone
   var MILESTONES = [500, 1000, 2000];
   var RUNNER_ROW = 82;       // percent-of-world where collisions resolve
   var HIT_TOLERANCE = 8;
@@ -66,8 +67,12 @@
 
   function laneLeft(l){ return LANE_X[l]; }
 
+  function speedTier(){
+    return Math.floor(state.elapsed / SPEED_TIER_SECONDS);
+  }
+
   function currentSpeed(){
-    return BASE_SPEED + state.elapsed * SPEED_GAIN + state.speedBump;
+    return BASE_SPEED + speedTier() * SPEED_TIER_STEP + state.speedBump;
   }
 
   function positionRunner(){
@@ -87,6 +92,7 @@
       lane: 1,
       elapsed: 0,
       speedBump: 0,
+      lastTier: 0,
       milestonesHit: {},
       batteriesCollected: 0,
       energyCollected: 0,
@@ -195,6 +201,15 @@
     });
   }
 
+  function checkSpeedTier(){
+    var tier = speedTier();
+    if(tier > state.lastTier){
+      state.lastTier = tier;
+      toast("⚡ Speeding up!");
+      blip(700, 0.045, 0.2);
+    }
+  }
+
   function loop(now){
     if(!state.running) return;
     var dt = Math.min(0.05, (now - lastTime) / 1000);
@@ -209,6 +224,7 @@
     state.battery -= (0.8 + state.elapsed * 0.02) * dt;
 
     checkMilestones();
+    checkSpeedTier();
 
     spawnTimer -= dt;
     if(spawnTimer <= 0){
