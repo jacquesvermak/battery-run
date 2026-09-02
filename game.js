@@ -286,7 +286,7 @@
   /* ---------------- controls ---------------- */
   $("#start").addEventListener("click", function(){ showScreen(gameEl); resetState(); });
   $("#again").addEventListener("click", function(){ showScreen(gameEl); resetState(); });
-  $("#home").addEventListener("click", function(){ showScreen(homeEl); });
+  $("#backHome").addEventListener("click", function(){ showScreen(homeEl); });
   $("#left").addEventListener("click", function(){ moveLane(-1); });
   $("#right").addEventListener("click", function(){ moveLane(1); });
 
