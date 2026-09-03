@@ -1,6 +1,6 @@
 # Battery Run — Stage Zero
 
-A 60-second lane runner for a sales-booth hand-off: tap ◀ ▶, swipe, or use the
+A 90-second lane runner for a sales-booth hand-off: tap ◀ ▶, swipe, or use the
 arrow keys to dodge hazards and collect energy on the way to the highest
 distance and score you can manage before the clock — or your battery — runs
 out.
@@ -18,7 +18,7 @@ Open <http://localhost:8080>.
 
 ## The loop
 
-1. **Start.** 60 seconds on the clock, battery at 50%.
+1. **Start.** 90 seconds on the clock, battery at 50%.
 2. **Move between 3 lanes** to collect what's falling toward you and dodge
    the rest. Speed steps up once every 10 seconds (a short "⚡ Speeding up!"
    banner marks each step), *and* jumps again the instant you cross 500m,
@@ -27,10 +27,14 @@ Open <http://localhost:8080>.
    Hazards drain it harder; solar and batteries refill it. Coins are pure
    score — no battery effect, since they're deliberately a bit riskier to
    detour for.
-4. **The run ends** the moment either the 60-second clock or your battery
+4. **The run ends** the moment either the 90-second clock or your battery
    hits zero, whichever comes first.
 5. **Result screen** — distance, batteries collected, other energy collected,
    score, and a "beat my score" share.
+
+A **"ℹ️ How to Play"** button on the home screen opens a dedicated
+instructions screen covering all of this — same pattern as every other game
+in the portfolio.
 
 ### Collect
 
@@ -48,17 +52,21 @@ Open <http://localhost:8080>.
 | ☁️ Cloud | −8% |
 | 💥 Energy monster | −20% |
 
-The spawn mix starts collectible-heavy (roughly 62/38 in your favour) and
-drifts toward hazards as the run goes on — early game is forgiving, the last
-few seconds aren't.
+The spawn mix starts collectible-heavy (roughly 75/25 in your favour) and
+drifts toward hazards as the run goes on (down to roughly 64/36) — early game
+is forgiving, the last stretch isn't. Spawn *frequency* also ramps from about
+one item every 0.75s down to one every 0.35s; the collectible/hazard split
+was rebalanced when frequency increased so hazard *encounter rate* stays
+roughly where it was, rather than both scaling up together and making the
+back half unfairly punishing.
 
 ### Scoring
 
 Score is time-passive (+10/sec just for staying alive) plus whatever you
-collect. A full, clean 60-second run — no early battery-out — covers roughly
-2,800m from the speed steps alone (six 10-second tiers at 32, 38, 44, 50, 56
-and 62 m/s-equivalent), typically more once distance-milestone speed bumps
-compound on top.
+collect. A full, clean 90-second run — no early battery-out — covers roughly
+5,040m from the speed steps alone (nine 10-second tiers, 32 up to 80
+m/s-equivalent), typically more once distance-milestone speed bumps compound
+on top.
 
 ## Architecture
 
@@ -75,8 +83,22 @@ percentages of `#world`, so the whole game reflows for any phone screen
 without special-casing sizes (a `max-width:380px` media query only tightens
 a few font sizes).
 
-Best distance persists in `localStorage` per device — there's no shared
-leaderboard here (see "Known limits").
+Best distance, best score, and total plays persist in `localStorage` per
+device and show on the home screen — there's no shared leaderboard here
+(see "Known limits").
+
+### Shared portfolio chrome, own gameplay scene
+
+The app shell (background, header panels, buttons, result screen, footer/
+stat text) uses the exact same navy-deep/navy-panel/gold/gold-deep/cream
+palette and 3D-press gold button style as `sz-solar-blast-game` and Sunny's
+Power Dash, plus the same `.logo-card` SVG wordmark, `.home-stats` row,
+`.footer-link`, and a "How to Play" screen — so it reads as one Stage Zero
+game family rather than N unrelated skins. What's deliberately *not* shared
+is the actual gameplay scene (`#world`/`.hero`): Battery Run's bright sky,
+sun, city and road are its own thing, the same way Solar Blast's night sky
+and Sunny's Power Dash's house interior are each their own game's look —
+only the chrome around the game matches.
 
 ## Deploying to QA
 
@@ -109,7 +131,8 @@ namespace before anything here starts syncing.
 
 ## Files
 
-- `index.html` / `style.css` / `game.js` — the whole game
+- `index.html` / `style.css` / `game.js` — the whole game: home/game/result/
+  info screens, spawn/collision loop, persistence, all inline
 - `Dockerfile` · `nginx.conf` — static image, non-root nginx on 8080, `/healthz`
 - `infrastructure/apps/sz-battery-run-game/` — Helm chart deployed by ArgoCD
 - `.github/workflows/deploy.yml` — build → push to Harbor → rewrite manifest → ArgoCD sync
