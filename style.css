@@ -17,6 +17,7 @@
   --warn:#ffc247;
   --bad:#ff5252;
   --shadow:rgba(6,14,35,0.5);
+  --cream:#fff6e5;
 }
 
 *{box-sizing:border-box;}
@@ -38,7 +39,7 @@ body{
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
 }
-h1,h2,.brand,button{font-family:"Baloo 2",sans-serif;}
+h1,h2,button{font-family:"Baloo 2",sans-serif;}
 button{font:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation;border:none;cursor:pointer;}
 b{font-style:normal;}
 
@@ -66,13 +67,6 @@ b{font-style:normal;}
   text-align:center;
   background:linear-gradient(180deg,var(--card),var(--ink) 75%);
 }
-.brand{
-  align-self:flex-start;
-  font-size:1rem;
-  font-weight:700;
-  letter-spacing:0.02em;
-}
-.brand i{color:var(--sky-3);font-style:normal;}
 .hero{
   position:relative;
   height:34vh;
@@ -109,6 +103,21 @@ b{font-style:normal;}
   letter-spacing:0.16em;
   margin:0;
 }
+
+/* Shared Stage Zero portfolio chrome — same markup/tokens as sz-solar-blast-game
+   and sz-sunnydash-game, so the "family" cues (cream logo card, gold stats,
+   footer link) read the same across every game even where the rest of the
+   page's palette and type don't match. */
+.logo-card{
+  background:var(--cream); border-radius:20px; padding:18px 22px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+  margin:0 auto 14px;
+  max-width:220px;
+}
+.logo-card svg{ width:100%; max-width:150px; height:auto; display:block; }
+
+.title-block{ text-align:center; }
 h1{font-size:2.9rem;line-height:0.86;margin:8px 0 14px;font-weight:800;text-wrap:balance;}
 h1 strong{color:var(--accent-2);}
 #home p:not(.eyebrow){color:var(--mist);line-height:1.5;font-weight:600;}
@@ -125,8 +134,18 @@ h1 strong{color:var(--accent-2);}
   box-shadow:0 8px 22px rgba(124,77,255,0.4);
 }
 #home #start:active{transform:scale(0.97);}
-#home small{color:var(--mist);font-weight:700;font-size:0.8rem;}
-#home small b{color:var(--sky-3);}
+
+.home-stats{ display:flex; justify-content:center; gap:22px; padding-top:4px; }
+.home-stats div{ text-align:center; }
+.home-stats b{ display:block; font-size:1.25rem; color:var(--sky-3); font-variant-numeric:tabular-nums; }
+.home-stats span{ font-size:0.66rem; color:var(--mist); text-transform:uppercase; letter-spacing:0.04em; }
+
+.footer-link{
+  display:block;
+  text-align:center; font-size:0.75rem; color:var(--mist);
+  text-decoration:none; padding-top:14px;
+}
+.footer-link b{ color:var(--sky-3); }
 
 /* ---------- game header ---------- */
 #game{padding:14px 14px calc(10px + env(safe-area-inset-bottom));}

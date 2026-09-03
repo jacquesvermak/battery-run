@@ -8,6 +8,7 @@
   var timeEl = $("#time"), batEl = $("#bat"), scoreEl = $("#score");
   var fillEl = $("#fill"), barEl = document.querySelector(".bar");
   var distEl = $("#dist"), bestEl = $("#best");
+  var bestScoreEl = $("#bestScore"), playsEl = $("#plays");
 
   var ROUND_SECONDS = 60;
   var LANE_X = [22, 50, 78]; // percent, left/center/right lane centers
@@ -32,7 +33,7 @@
   var SPAWN_WEIGHTS_END   = { solar:17, battery:15, coin:13, spark:18, cloud:18, monster:19 };
 
   var META_KEY = "battery-run-meta";
-  var meta = { muted:false, best:0 };
+  var meta = { muted:false, best:0, bestScore:0, plays:0 };
   function loadMeta(){
     try{
       var raw = localStorage.getItem(META_KEY);
@@ -286,14 +287,19 @@
     var dist = Math.round(state.dist);
     var score = Math.round(state.score);
     var isNewBest = dist > meta.best;
-    if(isNewBest){ meta.best = dist; saveMeta(); }
+    if(isNewBest) meta.best = dist;
+    if(score > meta.bestScore) meta.bestScore = score;
+    meta.plays += 1;
+    saveMeta();
 
     $("#fd").textContent = dist + " m";
     $("#fb").textContent = state.batteriesCollected;
     $("#fe").textContent = state.energyCollected;
     $("#fs").textContent = score.toLocaleString();
     $("#nb").textContent = isNewBest ? "🏆 NEW BEST DISTANCE!" : ("BEST: " + meta.best.toLocaleString() + " m");
-    bestEl.textContent = meta.best.toLocaleString();
+    bestEl.textContent = meta.best.toLocaleString() + " m";
+    bestScoreEl.textContent = meta.bestScore.toLocaleString();
+    playsEl.textContent = meta.plays.toLocaleString();
 
     blip(520, 0.05, 0.3);
     showScreen(resultEl);
@@ -363,7 +369,9 @@
 
   /* ---------------- init ---------------- */
   loadMeta();
-  bestEl.textContent = meta.best.toLocaleString();
+  bestEl.textContent = meta.best.toLocaleString() + " m";
+  bestScoreEl.textContent = meta.bestScore.toLocaleString();
+  playsEl.textContent = meta.plays.toLocaleString();
   refreshMuteBtn();
   buildSkyline();
 })();
