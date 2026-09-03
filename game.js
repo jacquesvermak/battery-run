@@ -29,8 +29,8 @@
     monster: { emoji:"💥", kind:"bad",  score:0,  battery:-20 }
   };
   // Spawn mix shifts from mostly-collectible to noticeably-harder over the round.
-  var SPAWN_WEIGHTS_START = { solar:29, battery:24, coin:22, spark:8, cloud:9, monster:8 };
-  var SPAWN_WEIGHTS_END   = { solar:24, battery:22, coin:19, spark:12, cloud:12, monster:12 };
+  var SPAWN_WEIGHTS_START = { solar:27, battery:22, coin:21, spark:10, cloud:11, monster:10 };
+  var SPAWN_WEIGHTS_END   = { solar:22, battery:20, coin:18, spark:14, cloud:14, monster:13 };
 
   var META_KEY = "battery-run-meta";
   var meta = { muted:false, best:0, bestScore:0, plays:0 };
