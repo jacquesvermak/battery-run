@@ -22,6 +22,7 @@
     <p>Run. Charge. Power up.<br>How far can you go?</p>
   </div>
   <button id="start">▶ START RUN</button>
+  <button class="btn-outline" id="btnInfo">ℹ️ How to Play</button>
   <div class="home-stats">
     <div><b id="bestScore">0</b><span>High Score</span></div>
     <div><b id="best">0</b><span>Best Distance</span></div>
@@ -32,7 +33,7 @@
 
 <section id="game" class="screen">
   <header>
-    <div>TIME<b id="time">60</b></div>
+    <div>TIME<b id="time">90</b></div>
     <div>BATTERY<b id="bat">50%</b></div>
     <div>SCORE<b id="score">0</b></div>
   </header>
@@ -66,6 +67,19 @@
   <button id="again">↻ RUN AGAIN</button>
   <button id="share">↗ CHALLENGE A FRIEND</button>
   <button id="backHome">BACK TO HOME</button>
+</section>
+
+<section id="info" class="screen info">
+  <h2>How to Play</h2>
+  <ul>
+    <li>Swipe left/right, tap ◀ ▶, or use the arrow keys to move between 3 lanes.</li>
+    <li>Collect <b>☀️ Solar</b>, <b>🔋 Batteries</b> and <b>💰 Coins</b> for points — solar and batteries also recharge your battery.</li>
+    <li>Avoid <b>⚡ Electrical hazards</b>, <b>☁️ Clouds</b> and <b>💥 Energy monsters</b> — they drain your battery.</li>
+    <li>Your battery drains a little on its own too, even without a hit — keep collecting to stay charged.</li>
+    <li>Speed steps up every 10 seconds, and again every time you pass 500m, 1,000m or 2,000m.</li>
+    <li>You've got <b>90 seconds</b>. The run ends the moment either the clock or your battery hits zero — see how far you can get!</li>
+  </ul>
+  <button class="btn-primary-gold" id="btnInfoClose">Got it</button>
 </section>
 
 </main>

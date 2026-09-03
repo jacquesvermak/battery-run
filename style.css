@@ -1,4 +1,8 @@
 :root{
+  /* Gameplay-world palette — Battery Run's own scene (sky/sun/city/road),
+     kept distinct from the shared chrome below the same way Solar Blast's
+     night-sky canvas and Sunny's Power Dash's house interior each keep
+     their own scene. */
   --sky-1:#1789e0;
   --sky-2:#5fd3ff;
   --sky-3:#ffe08a;
@@ -6,18 +10,32 @@
   --road-line:#7fe3ff;
   --city:#0d1730;
   --city-win:#ffd54f;
-  --ink:#0d1730;
+
+  /* Shared Stage Zero portfolio palette — same values as sz-solar-blast-game
+     and sz-sunnydash-game, so chrome (backgrounds, buttons, headings, stats)
+     reads as one family across every game. */
+  --navy-deep:#00144b;
+  --navy-panel:#101b3d;
+  --navy-panel-2:#182752;
+  --gold:#ffc400;
+  --gold-deep:#e8971a;
+  --storm:#4c63d2;
+  --surge:#48d56a;
+  --coral:#ff4b3e;
+  --cream:#fff6e5;
+  --line:rgba(255,255,255,0.14);
+
+  --ink:var(--navy-deep);
   --paper:#ffffff;
   --mist:#c9d6ea;
-  --card:#102a52;
-  --card-line:rgba(255,255,255,0.16);
-  --accent:#7c4dff;
-  --accent-2:#ff5da2;
-  --good:#33d17a;
+  --card:var(--navy-panel);
+  --card-line:var(--line);
+  --accent:var(--gold);
+  --accent-2:var(--gold-deep);
+  --good:var(--surge);
   --warn:#ffc247;
-  --bad:#ff5252;
+  --bad:var(--coral);
   --shadow:rgba(6,14,35,0.5);
-  --cream:#fff6e5;
 }
 
 *{box-sizing:border-box;}
@@ -51,7 +69,7 @@ b{font-style:normal;}
   position:relative;
   overflow:hidden;
   box-shadow:0 0 80px var(--shadow);
-  background:var(--ink);
+  background:linear-gradient(180deg,var(--navy-panel-2),var(--navy-deep));
 }
 
 .screen{
@@ -100,7 +118,7 @@ b{font-style:normal;}
 @keyframes idle-bounce{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,-8%);}}
 
 .eyebrow{
-  color:var(--sky-3);
+  color:var(--gold);
   font-size:0.68rem;
   font-weight:800;
   letter-spacing:0.16em;
@@ -129,18 +147,62 @@ h1 strong{color:var(--accent-2);}
   margin:16px 0 10px;
   padding:16px;
   border-radius:14px;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#fff;
+  background:linear-gradient(180deg,var(--gold),var(--gold-deep));
+  color:var(--ink);
   font-size:1.1rem;
   font-weight:800;
   letter-spacing:0.02em;
-  box-shadow:0 8px 22px rgba(124,77,255,0.4);
+  box-shadow:0 6px 0 #a56a0d, 0 10px 24px rgba(0,0,0,0.3);
+  transition:transform 0.1s ease,box-shadow 0.1s ease;
 }
-#home #start:active{transform:scale(0.97);}
+#home #start:active{transform:translateY(4px);box-shadow:0 2px 0 #a56a0d;}
+
+.btn-outline{
+  width:100%;
+  margin-bottom:16px;
+  padding:13px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.06);
+  color:var(--cream);
+  border:1.5px solid var(--line);
+  font-size:0.95rem;
+  font-weight:700;
+}
+.btn-outline:active{background:rgba(255,255,255,0.14);}
+
+.btn-primary-gold{
+  width:100%;
+  padding:16px;
+  border-radius:14px;
+  background:linear-gradient(180deg,var(--gold),var(--gold-deep));
+  color:var(--ink);
+  font-size:1.05rem;
+  font-weight:800;
+  box-shadow:0 6px 0 #a56a0d, 0 10px 24px rgba(0,0,0,0.3);
+  transition:transform 0.1s ease,box-shadow 0.1s ease;
+}
+.btn-primary-gold:active{transform:translateY(4px);box-shadow:0 2px 0 #a56a0d;}
+
+/* ---------- info (How to Play) ---------- */
+#info{
+  padding:22px 22px calc(22px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,var(--navy-panel-2),var(--navy-deep) 40%);
+  overflow-y:auto;
+}
+#info h2{color:var(--gold);text-align:center;margin:0 0 16px;font-size:1.6rem;}
+#info ul{
+  list-style:none;padding:0;margin:0 0 18px;
+  display:flex;flex-direction:column;gap:10px;
+}
+#info li{
+  background:var(--card);border:1px solid var(--card-line);border-radius:12px;
+  padding:12px 14px;font-size:0.85rem;line-height:1.5;color:var(--mist);
+}
+#info li b{color:var(--gold);}
 
 .home-stats{ display:flex; justify-content:center; gap:22px; padding-top:4px; }
 .home-stats div{ text-align:center; }
-.home-stats b{ display:block; font-size:1.25rem; color:var(--sky-3); font-variant-numeric:tabular-nums; }
+.home-stats b{ display:block; font-size:1.25rem; color:var(--gold); font-variant-numeric:tabular-nums; }
 .home-stats span{ font-size:0.66rem; color:var(--mist); text-transform:uppercase; letter-spacing:0.04em; }
 
 .footer-link{
@@ -148,7 +210,7 @@ h1 strong{color:var(--accent-2);}
   text-align:center; font-size:0.75rem; color:var(--mist);
   text-decoration:none; padding-top:14px;
 }
-.footer-link b{ color:var(--sky-3); }
+.footer-link b{ color:var(--gold); }
 
 /* ---------- game header ---------- */
 #game{padding:14px 14px calc(10px + env(safe-area-inset-bottom));}
@@ -326,7 +388,7 @@ h1 strong{color:var(--accent-2);}
   color:#fff;font-size:1.2rem;
 }
 #game footer button:active{transform:scale(0.94);}
-#game footer b{font-size:1.15rem;color:var(--sky-3);font-variant-numeric:tabular-nums;}
+#game footer b{font-size:1.15rem;color:var(--gold);font-variant-numeric:tabular-nums;}
 
 .mute-btn{
   position:absolute;top:10px;right:10px;z-index:20;
@@ -346,11 +408,12 @@ h1 strong{color:var(--accent-2);}
   padding:14px;color:var(--mist);font-size:0.66rem;font-weight:800;letter-spacing:0.06em;
 }
 .result article b{display:block;color:#fff;font-size:1.5rem;margin-top:4px;font-variant-numeric:tabular-nums;}
-.result h3{color:var(--sky-3);min-height:1.2em;font-size:0.95rem;}
-.result button{width:100%;margin-top:9px;padding:15px;border-radius:14px;font-weight:800;font-size:1rem;}
-.result #again{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;}
+.result h3{color:var(--gold);min-height:1.2em;font-size:0.95rem;}
+.result button{width:100%;margin-top:9px;padding:15px;border-radius:14px;font-weight:800;font-size:1rem;transition:transform 0.1s ease,box-shadow 0.1s ease;}
+.result #again{background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:var(--ink);box-shadow:0 6px 0 #a56a0d, 0 10px 24px rgba(0,0,0,0.3);}
+.result #again:active{transform:translateY(4px);box-shadow:0 2px 0 #a56a0d;}
 .result #share{background:var(--card);border:1px solid var(--card-line);color:#fff;}
-.result #home{background:none;color:var(--mist);}
+.result #backHome{background:none;color:var(--mist);}
 
 @media (max-height:650px){
   .hero{height:180px;min-height:0;}

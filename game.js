@@ -2,7 +2,7 @@
   "use strict";
 
   var $ = function(s){ return document.querySelector(s); };
-  var homeEl = $("#home"), gameEl = $("#game"), resultEl = $("#result");
+  var homeEl = $("#home"), gameEl = $("#game"), resultEl = $("#result"), infoEl = $("#info");
   var itemsEl = $("#items"), runnerEl = $("#runner"), worldEl = $("#world");
   var msgEl = $("#msg"), hintEl = worldEl.querySelector("em");
   var timeEl = $("#time"), batEl = $("#bat"), scoreEl = $("#score");
@@ -10,7 +10,7 @@
   var distEl = $("#dist"), bestEl = $("#best");
   var bestScoreEl = $("#bestScore"), playsEl = $("#plays");
 
-  var ROUND_SECONDS = 60;
+  var ROUND_SECONDS = 90;
   var LANE_X = [22, 50, 78]; // percent, left/center/right lane centers
   var BASE_SPEED = 32;       // starting m/s-equivalent
   var SPEED_TIER_SECONDS = 10; // speed steps up once per this many seconds
@@ -29,8 +29,8 @@
     monster: { emoji:"💥", kind:"bad",  score:0,  battery:-20 }
   };
   // Spawn mix shifts from mostly-collectible to noticeably-harder over the round.
-  var SPAWN_WEIGHTS_START = { solar:24, battery:20, coin:18, spark:12, cloud:14, monster:12 };
-  var SPAWN_WEIGHTS_END   = { solar:17, battery:15, coin:13, spark:18, cloud:18, monster:19 };
+  var SPAWN_WEIGHTS_START = { solar:29, battery:24, coin:22, spark:8, cloud:9, monster:8 };
+  var SPAWN_WEIGHTS_END   = { solar:24, battery:22, coin:19, spark:12, cloud:12, monster:12 };
 
   var META_KEY = "battery-run-meta";
   var meta = { muted:false, best:0, bestScore:0, plays:0 };
@@ -62,7 +62,7 @@
   var state = null, rafId = null, lastTime = 0, spawnTimer = 0;
 
   function showScreen(el){
-    [homeEl, gameEl, resultEl].forEach(function(s){ s.classList.remove("active"); });
+    [homeEl, gameEl, resultEl, infoEl].forEach(function(s){ s.classList.remove("active"); });
     el.classList.add("active");
   }
 
@@ -230,7 +230,7 @@
     spawnTimer -= dt;
     if(spawnTimer <= 0){
       spawnItem();
-      spawnTimer = Math.max(0.55, 1.15 - state.elapsed * 0.010);
+      spawnTimer = Math.max(0.35, 0.75 - state.elapsed * 0.0057);
     }
 
     var fallRate = speed * 0.8; // percent-of-world-height per second
@@ -309,6 +309,8 @@
   $("#start").addEventListener("click", function(){ showScreen(gameEl); resetState(); });
   $("#again").addEventListener("click", function(){ showScreen(gameEl); resetState(); });
   $("#backHome").addEventListener("click", function(){ showScreen(homeEl); });
+  $("#btnInfo").addEventListener("click", function(){ showScreen(infoEl); });
+  $("#btnInfoClose").addEventListener("click", function(){ showScreen(homeEl); });
   $("#left").addEventListener("click", function(){ moveLane(-1); });
   $("#right").addEventListener("click", function(){ moveLane(1); });
 
