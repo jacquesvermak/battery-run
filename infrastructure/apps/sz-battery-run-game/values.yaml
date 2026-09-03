@@ -9,7 +9,7 @@
 
 image:
   repository: harbor.qa.stagezero.co.za/library/sz-battery-run-game
-  tag: "more-challenging"
+  tag: "leaderboard-v1"
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -45,3 +45,25 @@ healthCheck:
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 3
+
+# Tiny SQLite-backed top-10 leaderboard API. Same CI/tag-rewrite pattern as
+# the main image, just a second image/tag pair — see .github/workflows/deploy.yml.
+api:
+  enabled: true
+  image:
+    repository: harbor.qa.stagezero.co.za/library/sz-battery-run-leaderboard-api
+    tag: "leaderboard-v1"
+    pullPolicy: Always
+  imagePullSecrets: []
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "32Mi"
+    limits:
+      cpu: "150m"
+      memory: "128Mi"
+  service:
+    port: 80
+    targetPort: 3000
+  storage:
+    size: 256Mi

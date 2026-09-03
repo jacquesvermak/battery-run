@@ -1,0 +1,16 @@
+{{- if .Values.api.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Chart.Name }}-api-data
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}-api
+    app.kubernetes.io/name: {{ .Chart.Name }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.api.storage.size }}
+{{- end }}

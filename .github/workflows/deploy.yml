@@ -19,11 +19,13 @@ on:
       - 'nginx.conf'
       - 'Dockerfile'
       - '.dockerignore'
+      - 'api/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 env:
   APP_NAME: sz-battery-run-game
+  API_APP_NAME: sz-battery-run-leaderboard-api
   INFRASTRUCTURE_PATH: infrastructure/apps/sz-battery-run-game
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   HARBOR_URL: ${{ vars.HARBOR_URL || 'harbor.qa.stagezero.co.za' }}
@@ -108,10 +110,28 @@ jobs:
           cache-to: type=registry,ref=${{ env.HARBOR_URL }}/library/${{ env.APP_NAME }}:buildcache,mode=min
         timeout-minutes: 10
 
+      - name: Build and push leaderboard API image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./api
+          file: ./api/Dockerfile
+          push: true
+          tags: |
+            ${{ env.HARBOR_URL }}/library/${{ env.API_APP_NAME }}:${{ steps.vars.outputs.image_tag }}
+            ${{ env.HARBOR_URL }}/library/${{ env.API_APP_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.HARBOR_URL }}/library/${{ env.API_APP_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.HARBOR_URL }}/library/${{ env.API_APP_NAME }}:buildcache,mode=min
+        timeout-minutes: 10
+
       - name: Update image tag in values.yaml and Chart.yaml
         run: |
           IMAGE_TAG="${{ steps.vars.outputs.image_tag }}"
+          # Top-level image.tag (2-space indent) and api.image.tag (4-space
+          # indent) are distinct lines — both get the same commit SHA, so
+          # every image built from this commit is traceable to it.
           sed -i "s/^  tag: \".*\"/  tag: \"${IMAGE_TAG}\"/" \
+            "${{ env.INFRASTRUCTURE_PATH }}/values.yaml"
+          sed -i "s/^    tag: \".*\"/    tag: \"${IMAGE_TAG}\"/" \
             "${{ env.INFRASTRUCTURE_PATH }}/values.yaml"
           sed -i "s/^appVersion: .*/appVersion: \"${IMAGE_TAG}\"/" \
             "${{ env.INFRASTRUCTURE_PATH }}/Chart.yaml"

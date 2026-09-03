@@ -3,6 +3,7 @@
 
   var $ = function(s){ return document.querySelector(s); };
   var homeEl = $("#home"), gameEl = $("#game"), resultEl = $("#result"), infoEl = $("#info");
+  var leaderboardEl = $("#leaderboard");
   var itemsEl = $("#items"), runnerEl = $("#runner"), worldEl = $("#world");
   var msgEl = $("#msg"), hintEl = worldEl.querySelector("em");
   var timeEl = $("#time"), batEl = $("#bat"), scoreEl = $("#score");
@@ -62,7 +63,7 @@
   var state = null, rafId = null, lastTime = 0, spawnTimer = 0;
 
   function showScreen(el){
-    [homeEl, gameEl, resultEl, infoEl].forEach(function(s){ s.classList.remove("active"); });
+    [homeEl, gameEl, resultEl, infoEl, leaderboardEl].forEach(function(s){ s.classList.remove("active"); });
     el.classList.add("active");
   }
 
@@ -280,6 +281,8 @@
     }
   }
 
+  var lastRun = null;
+
   function finishRun(){
     state.running = false;
     cancelAnimationFrame(rafId);
@@ -291,6 +294,7 @@
     if(score > meta.bestScore) meta.bestScore = score;
     meta.plays += 1;
     saveMeta();
+    lastRun = { dist: dist, score: score };
 
     $("#fd").textContent = dist + " m";
     $("#fb").textContent = state.batteriesCollected;
@@ -301,8 +305,100 @@
     bestScoreEl.textContent = meta.bestScore.toLocaleString();
     playsEl.textContent = meta.plays.toLocaleString();
 
+    resetLbSubmitUI();
+
     blip(520, 0.05, 0.3);
     showScreen(resultEl);
+  }
+
+  /* ---------------- leaderboard ---------------- */
+  var lbSubmitEl = $("#lbSubmit"), lbNameEl = $("#lbName"), lbSubmitBtnEl = $("#lbSubmitBtn");
+  var lbMsgEl = $("#lbMsg"), lbListEl = $("#lbList"), lbViewBtnEl = $("#btnLeaderboardResult");
+
+  function resetLbSubmitUI(){
+    lbSubmitEl.style.display = "";
+    lbViewBtnEl.style.display = "none";
+    lbNameEl.value = "";
+    lbNameEl.disabled = false;
+    lbSubmitBtnEl.disabled = false;
+    lbMsgEl.textContent = "";
+    lbMsgEl.className = "lb-msg";
+  }
+
+  function renderLeaderboard(rows){
+    if(!rows || !rows.length){
+      lbListEl.innerHTML = '<p class="lb-status">No runs yet — be the first on the board.</p>';
+      return;
+    }
+    var medalClass = ["top1", "top2", "top3"];
+    lbListEl.innerHTML = rows.map(function(row, i){
+      var cls = "lb-row" + (medalClass[i] ? " " + medalClass[i] : "");
+      var name = escapeHtml(row.name);
+      var score = Number(row.score || 0).toLocaleString();
+      var dist = Number(row.distance || 0).toLocaleString();
+      return '<div class="' + cls + '">' +
+        '<span class="rank">' + (i + 1) + '</span>' +
+        '<span class="lb-name">' + name + '</span>' +
+        '<span class="lb-score">' + score + '<div class="lb-dist">' + dist + ' m</div></span>' +
+        '</div>';
+    }).join("");
+  }
+
+  function escapeHtml(str){
+    var div = document.createElement("div");
+    div.textContent = String(str == null ? "" : str);
+    return div.innerHTML;
+  }
+
+  function loadLeaderboard(){
+    lbListEl.innerHTML = '<p class="lb-status">Loading…</p>';
+    fetch("/api/leaderboard")
+      .then(function(res){ if(!res.ok) throw new Error("bad response"); return res.json(); })
+      .then(renderLeaderboard)
+      .catch(function(){
+        lbListEl.innerHTML = '<p class="lb-status">Could not reach the leaderboard right now.</p>';
+      });
+  }
+
+  function submitScore(){
+    var name = lbNameEl.value.trim();
+    if(!name){
+      lbMsgEl.textContent = "Enter a name first.";
+      lbMsgEl.className = "lb-msg err";
+      return;
+    }
+    if(!lastRun){
+      lbMsgEl.textContent = "Play a run first.";
+      lbMsgEl.className = "lb-msg err";
+      return;
+    }
+    lbNameEl.disabled = true;
+    lbSubmitBtnEl.disabled = true;
+    lbMsgEl.textContent = "Submitting…";
+    lbMsgEl.className = "lb-msg";
+
+    fetch("/api/leaderboard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name, score: lastRun.score, distance: lastRun.dist })
+    })
+      .then(function(res){
+        if(!res.ok) return res.json().then(function(body){ throw new Error((body && body.error) || "Submit failed."); });
+        return res.json();
+      })
+      .then(function(rows){
+        lbMsgEl.textContent = "You're on the board!";
+        lbMsgEl.className = "lb-msg ok";
+        lbSubmitEl.style.display = "none";
+        lbViewBtnEl.style.display = "";
+        renderLeaderboard(rows);
+      })
+      .catch(function(err){
+        lbMsgEl.textContent = (err && err.message) || "Couldn't submit right now.";
+        lbMsgEl.className = "lb-msg err";
+        lbNameEl.disabled = false;
+        lbSubmitBtnEl.disabled = false;
+      });
   }
 
   /* ---------------- controls ---------------- */
@@ -311,6 +407,12 @@
   $("#backHome").addEventListener("click", function(){ showScreen(homeEl); });
   $("#btnInfo").addEventListener("click", function(){ showScreen(infoEl); });
   $("#btnInfoClose").addEventListener("click", function(){ showScreen(homeEl); });
+
+  $("#btnLeaderboardHome").addEventListener("click", function(){ showScreen(leaderboardEl); loadLeaderboard(); });
+  $("#btnLeaderboardResult").addEventListener("click", function(){ showScreen(leaderboardEl); loadLeaderboard(); });
+  $("#btnLeaderboardClose").addEventListener("click", function(){ showScreen(homeEl); });
+  lbSubmitBtnEl.addEventListener("click", submitScore);
+  lbNameEl.addEventListener("keydown", function(e){ if(e.key === "Enter") submitScore(); });
   $("#left").addEventListener("click", function(){ moveLane(-1); });
   $("#right").addEventListener("click", function(){ moveLane(1); });
 

@@ -170,6 +170,9 @@ h1 strong{color:var(--accent-2);}
 }
 .btn-outline:active{background:rgba(255,255,255,0.14);}
 
+.btn-row{display:flex;gap:10px;margin-bottom:16px;}
+.btn-row .btn-outline{width:auto;flex:1;margin-bottom:0;font-size:0.85rem;padding:11px 8px;}
+
 .btn-primary-gold{
   width:100%;
   padding:16px;
@@ -414,6 +417,43 @@ h1 strong{color:var(--accent-2);}
 .result #again:active{transform:translateY(4px);box-shadow:0 2px 0 #a56a0d;}
 .result #share{background:var(--card);border:1px solid var(--card-line);color:#fff;}
 .result #backHome{background:none;color:var(--mist);}
+
+.lb-submit{margin-top:6px;}
+.lb-submit input{
+  width:100%;padding:12px 14px;margin-bottom:8px;
+  border-radius:12px;border:1.5px solid var(--line);
+  background:rgba(255,255,255,0.06);color:#fff;
+  font-size:0.95rem;font-family:inherit;text-align:center;
+}
+.lb-submit input::placeholder{color:var(--mist);}
+.lb-submit input:focus{outline:none;border-color:var(--gold);}
+.lb-msg{margin:6px 0 0;font-size:0.78rem;min-height:1.1em;color:var(--mist);}
+.lb-msg.err{color:var(--coral);}
+.lb-msg.ok{color:var(--surge);}
+
+/* ---------- leaderboard ---------- */
+.leaderboard{
+  padding:22px 22px calc(22px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,var(--navy-panel-2),var(--navy-deep) 40%);
+}
+.leaderboard h2{color:var(--gold);text-align:center;margin:0 0 16px;font-size:1.6rem;}
+.leaderboard button{width:100%;margin-top:14px;padding:15px;border-radius:14px;font-weight:800;font-size:1rem;}
+#lbList{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;}
+.lb-status{text-align:center;color:var(--mist);font-size:0.85rem;padding:20px 0;}
+.lb-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--card-line);border-radius:12px;
+  padding:10px 14px;
+}
+.lb-row .rank{
+  font-weight:800;font-size:1rem;color:var(--mist);width:20px;flex:none;text-align:center;
+}
+.lb-row.top1 .rank{color:var(--gold);}
+.lb-row.top2 .rank{color:#d9d9d9;}
+.lb-row.top3 .rank{color:#cd8a4e;}
+.lb-row .lb-name{flex:1;font-weight:700;color:#fff;font-size:0.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-row .lb-score{font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;font-size:0.95rem;}
+.lb-row .lb-dist{font-size:0.68rem;color:var(--mist);font-variant-numeric:tabular-nums;}
 
 @media (max-height:650px){
   .hero{height:180px;min-height:0;}

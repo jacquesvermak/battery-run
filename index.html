@@ -22,7 +22,10 @@
     <p>Run. Charge. Power up.<br>How far can you go?</p>
   </div>
   <button id="start">▶ START RUN</button>
-  <button class="btn-outline" id="btnInfo">ℹ️ How to Play</button>
+  <div class="btn-row">
+    <button class="btn-outline" id="btnLeaderboardHome">🏆 Leaderboard</button>
+    <button class="btn-outline" id="btnInfo">ℹ️ How to Play</button>
+  </div>
   <div class="home-stats">
     <div><b id="bestScore">0</b><span>High Score</span></div>
     <div><b id="best">0</b><span>Best Distance</span></div>
@@ -64,9 +67,23 @@
     <span>SCORE<b id="fs">0</b></span>
   </article>
   <h3 id="nb"></h3>
+
+  <div class="lb-submit" id="lbSubmit">
+    <input type="text" id="lbName" placeholder="Your name" maxlength="20" autocomplete="off">
+    <button class="btn-primary-gold" id="lbSubmitBtn">🏆 Submit to Leaderboard</button>
+    <p class="lb-msg" id="lbMsg"></p>
+  </div>
+  <button class="btn-outline" id="btnLeaderboardResult" style="display:none;">🏆 View Leaderboard</button>
+
   <button id="again">↻ RUN AGAIN</button>
   <button id="share">↗ CHALLENGE A FRIEND</button>
   <button id="backHome">BACK TO HOME</button>
+</section>
+
+<section id="leaderboard" class="screen leaderboard">
+  <h2>🏆 Top 10</h2>
+  <div id="lbList"><p class="lb-status">Loading…</p></div>
+  <button class="btn-primary-gold" id="btnLeaderboardClose">Back</button>
 </section>
 
 <section id="info" class="screen info">

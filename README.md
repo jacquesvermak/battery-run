@@ -5,8 +5,9 @@ arrow keys to dodge hazards and collect energy on the way to the highest
 distance and score you can manage before the clock — or your battery — runs
 out.
 
-Plain HTML + CSS + JS, no build step, no external JS dependencies. Three
-files: `index.html`, `style.css`, `game.js`.
+Plain HTML + CSS + JS on the front end, no build step, no framework — plus a
+tiny backend now: a shared top-10 leaderboard, so a run submitted on one
+device shows up for everyone.
 
 ## Run
 
@@ -30,11 +31,13 @@ Open <http://localhost:8080>.
 4. **The run ends** the moment either the 90-second clock or your battery
    hits zero, whichever comes first.
 5. **Result screen** — distance, batteries collected, other energy collected,
-   score, and a "beat my score" share.
+   score, a name field to submit your run to the shared **Top 10**, and a
+   "beat my score" share.
 
 A **"ℹ️ How to Play"** button on the home screen opens a dedicated
 instructions screen covering all of this — same pattern as every other game
-in the portfolio.
+in the portfolio. A **"🏆 Leaderboard"** button next to it (and again after a
+run) shows the shared top 10 — see "Shared leaderboard" below.
 
 ### Collect
 
@@ -84,8 +87,27 @@ without special-casing sizes (a `max-width:380px` media query only tightens
 a few font sizes).
 
 Best distance, best score, and total plays persist in `localStorage` per
-device and show on the home screen — there's no shared leaderboard here
-(see "Known limits").
+device and show on the home screen. The **top 10** is different: it's shared
+across every device, backed by a small API (see below).
+
+### Shared leaderboard
+
+`api/` is a separate, tiny Node/Express service (`api/server.js`, ~100
+lines) backed by SQLite on its own persistent volume — deliberately the
+smallest thing that could work for "a top 10 list", not a general-purpose
+database. Two endpoints:
+
+```
+GET  /api/leaderboard   -> top 10 [{name, score, distance}, ...]
+POST /api/leaderboard    -> {name, score, distance} -> the new top 10
+```
+
+The frontend calls these as plain relative paths (`fetch("/api/leaderboard")`)
+— the ingress routes `/api/*` to the API's Service and everything else to the
+static site's Service, both on the same hostname, so there's no CORS
+configuration to get right. A run's name is a free-text nickname only — no
+email, no phone number — kept deliberately low-stakes to show publicly,
+unlike Loadbreaker's lead-capture form.
 
 ### Shared portfolio chrome, own gameplay scene
 
@@ -102,9 +124,10 @@ only the chrome around the game matches.
 
 ## Deploying to QA
 
-Push to `main` → GitHub Action builds the image → Harbor → the action rewrites
-the image tag in `infrastructure/apps/sz-battery-run-game/values.yaml` →
-ArgoCD syncs. Lands at **https://battery-run.qa.stagezero.co.za**.
+Push to `main` → GitHub Action builds **two** images (the static site and the
+leaderboard API) → Harbor → the action rewrites both image tags in
+`infrastructure/apps/sz-battery-run-game/values.yaml` → ArgoCD syncs. Lands
+at **https://battery-run.qa.stagezero.co.za**.
 
 Same pattern as `sz-loadbreaker-game`: the chart keeps its config in the
 default `values.yaml` rather than an `env/qa/` overlay, so Helm — and
@@ -115,6 +138,13 @@ for the two to disagree about the image tag. `nginx.conf` sends
 whole app is a few KB, so there's no real cost to always revalidating, and it
 avoids a stale cached copy of the game logic surviving a fix (this bit
 Loadbreaker once).
+
+The API runs as its own `Deployment` with a `256Mi` `PersistentVolumeClaim`
+for the SQLite file, `strategy: Recreate` (not the default `RollingUpdate`)
+since a `ReadWriteOnce` volume can only be mounted by one pod at a time — the
+old pod has to fully terminate before the new one starts, so there's a few
+seconds of leaderboard downtime on every deploy. Fine for a top-10 list;
+would not be fine for something that needs zero-downtime deploys.
 
 ### One-time setup
 
@@ -132,10 +162,12 @@ namespace before anything here starts syncing.
 ## Files
 
 - `index.html` / `style.css` / `game.js` — the whole game: home/game/result/
-  info screens, spawn/collision loop, persistence, all inline
-- `Dockerfile` · `nginx.conf` — static image, non-root nginx on 8080, `/healthz`
+  info/leaderboard screens, spawn/collision loop, persistence, all inline
+- `Dockerfile` · `nginx.conf` — static site image, non-root nginx on 8080, `/healthz`
+- `api/` — the leaderboard service (`server.js`, `package.json`, its own `Dockerfile`)
 - `infrastructure/apps/sz-battery-run-game/` — Helm chart deployed by ArgoCD
-- `.github/workflows/deploy.yml` — build → push to Harbor → rewrite manifest → ArgoCD sync
+  (both Deployments, both Services, the PVC, one Ingress with two paths)
+- `.github/workflows/deploy.yml` — build both images → push to Harbor → rewrite manifest → ArgoCD sync
 
 ## Known limits of this build
 
@@ -145,8 +177,20 @@ namespace before anything here starts syncing.
   its own — until then, a code change needs a manual
   `docker build && docker push` plus a `values.yaml` tag bump, same as every
   update so far.
-- **No shared leaderboard.** Best distance is per-device (`localStorage`).
-  A real cross-booth leaderboard needs a small backend.
+- **No anti-cheat.** The leaderboard API trusts whatever score/distance the
+  client sends (only bounds-checked against implausible values, e.g. a score
+  over 300,000). Fine for a booth demo among honest players; would need a
+  server-side-authoritative run log before this could matter competitively.
+- **Names are public and unmoderated.** Anyone can submit anything as a
+  "name" (control characters are stripped, length is capped at 20, but
+  there's no profanity filter). Worth adding before an unsupervised public
+  activation.
+- **`api/`'s `npm audit` reports 3 moderate advisories** in `qs` (a
+  transitive dep of Express's body-parser, a query-string-parsing DoS). Not
+  applicable here — both endpoints only ever parse a JSON body, never a query
+  string — but `npm audit fix` doesn't have a non-breaking fix available yet,
+  so it's left as a known, accepted advisory rather than forcing an Express
+  major-version bump for a booth-game leaderboard.
 - **No lead-capture screen.** Unlike Loadbreaker, this build doesn't ask for
   contact details anywhere — worth adding if this is meant to double as a
   lead-generation tool, not just a booth attraction.

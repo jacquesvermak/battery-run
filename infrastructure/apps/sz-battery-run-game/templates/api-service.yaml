@@ -1,0 +1,19 @@
+{{- if .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}-api
+    app.kubernetes.io/name: {{ .Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.api.service.port }}
+      targetPort: {{ .Values.api.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Chart.Name }}-api
+{{- end }}
