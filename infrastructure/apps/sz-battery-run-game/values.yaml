@@ -9,7 +9,7 @@
 
 image:
   repository: harbor.qa.stagezero.co.za/library/sz-battery-run-game
-  tag: "branded-home"
+  tag: "fix-hero-zindex"
   pullPolicy: Always
 
 imagePullSecrets: []

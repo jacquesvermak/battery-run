@@ -78,6 +78,7 @@ b{font-style:normal;}
 .hero>span{
   position:absolute;right:14%;top:12%;
   font-size:3.4rem;
+  z-index:2;
   filter:drop-shadow(0 0 18px rgba(255,224,138,0.8));
   animation:sun-pulse 3.2s ease-in-out infinite;
 }
@@ -85,11 +86,13 @@ b{font-style:normal;}
   position:absolute;bottom:14%;left:50%;
   transform:translateX(-50%);
   font-size:3.6rem;
+  z-index:2;
   animation:idle-bounce 0.9s ease-in-out infinite;
 }
 .hero:after{
   content:"";
   position:absolute;bottom:0;left:16%;width:68%;height:42%;
+  z-index:1;
   background:var(--city);
   clip-path:polygon(0 100%, 0 55%, 12% 55%, 12% 30%, 24% 30%, 24% 62%, 38% 62%, 38% 15%, 52% 15%, 52% 48%, 66% 48%, 66% 25%, 80% 25%, 80% 58%, 100% 58%, 100% 100%);
 }
